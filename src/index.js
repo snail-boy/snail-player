@@ -1,4 +1,5 @@
 import Utils from './utils/index.js'
+
 let utils = new Utils()
 
 class snailPlayer {
@@ -22,7 +23,9 @@ class snailPlayer {
     this.startAndPauseStart = null // 开始按钮
     this.startAndPausePause = null // 暂停按钮
     this.rollTime = null // 滚动时间
+    this.playDot = null // 拖拽点
     this.playing = false
+    this.dbClickTimer = null // 但双击定时器
     this.getEle()
   }
 
@@ -43,12 +46,16 @@ class snailPlayer {
     this.startAndPausePause = utils.classEle('sn-player-start-end-pause')
 
     this.rollTime = utils.classEle('sn-player-roll-time')
+    this.playDot = utils.classEle('sn-player-progress-player-dot')
+
 
     this.progressw = this.progress.getBoundingClientRect().width
+
+
     this.init()
     // this.funcToShow()
     this.setValue()
-    this.fullScreenFun()
+
     this.videoFunc()
     this.eventFun()
   }
@@ -60,61 +67,130 @@ class snailPlayer {
     utils.changeInnerText('sn-player-total-time', this.totalTime)
 
     // 播放时间当前时间
-    this.playVideo.ontimeupdate = ()  => {
+    this.playVideo.ontimeupdate = () => {
       this.currentTime = utils.formatSeconds(this.playVideo.currentTime)
       utils.changeInnerText('sn-player-current-time', this.currentTime)
       // 进度条滚动
-      console.log(this.progressCalculate(), 'this.progressCalculate()')
-       this.progressFinish.style.width = this.progressCalculate() + 'px'
+      this.progressFinish.style.width = this.progressCalculate() + 'px'
+      this.playDot.style.left = this.progressCalculate() + 'px'
     }
 
     // 播放结束后
     this.playVideo.onended = () => {
-      utils.hiddenClass('sn-player-player-start')
-      utils.showClass('sn-player-player-pause')
+      utils.hiddenClass('sn-player-player-pause')
+      utils.showClass('sn-player-player-start')
+      utils.removeClass(this.startAndPauseStart, 'sn-player-start-end-box-active')
+      utils.addClass(this.startAndPausePause, 'sn-player-start-end-box-active')
+      this.playing = false
     }
 
     // 点击任意播放器区域，暂停或开始
     this.videoWrapper.onclick = () => {
-      if (!this.playing) {
-        this.playVideo.play()
-        utils.hiddenClass('sn-player-player-start')
-        utils.showClass('sn-player-player-pause')
-        utils.addClass(this.startAndPauseStart, 'sn-player-start-end-box-active')
-        utils.removeClass(this.startAndPausePause, 'sn-player-start-end-box-active')
-        this.playing = true
-      }else {
-        this.playVideo.pause()
-        utils.hiddenClass('sn-player-player-pause')
-        utils.showClass('sn-player-player-start')
-        utils.removeClass(this.startAndPauseStart, 'sn-player-start-end-box-active')
-        utils.addClass(this.startAndPausePause, 'sn-player-start-end-box-active')
-        this.playing = false
-      }
+      clearTimeout(this.dbClickTimer)
+      this.dbClickTimer = setTimeout(() => {
+        if (!this.playing) {
+          this.playVideo.play()
+          utils.hiddenClass('sn-player-player-start')
+          utils.showClass('sn-player-player-pause')
+          utils.addClass(this.startAndPauseStart, 'sn-player-start-end-box-active')
+          utils.removeClass(this.startAndPausePause, 'sn-player-start-end-box-active')
+          this.playing = true
+        } else {
+          this.playVideo.pause()
+          utils.hiddenClass('sn-player-player-pause')
+          utils.showClass('sn-player-player-start')
+          utils.removeClass(this.startAndPauseStart, 'sn-player-start-end-box-active')
+          utils.addClass(this.startAndPausePause, 'sn-player-start-end-box-active')
+          this.playing = false
+        }
+      }, 200)
     }
 
-    // 鼠标移动时，时间随着移动
+    // 全屏
 
+    this.fullScreen.onclick = () => {
+      this.fullScreenFun()
+    }
+
+    // 双击全屏或退出全屏
+    this.videoWrapper.ondblclick = () => {
+      clearTimeout(this.dbClickTimer)
+      this.fullScreenFun()
+    }
+
+    let currentTime = (offsetY) => {
+      return (offsetY / this.progressw * this.playVideo.duration).toFixed(2)
+    }
+    // 点击进度条，定位到该位置，播放
+    this.progress.onclick = (e) => {
+      this.playDot.style.left = e.offsetX + 'px'
+      this.progressFinish.style.width = this.playDot.style.left
+      this.playVideo.currentTime = currentTime(e.offsetX)
+    }
   }
+
 
   // 监听事件
   eventFun() {
+    // 鼠标移动时，时间随着移动
     this.progress.addEventListener('mousemove', (e) => {
-      // console.log(e.offsetX)
-      console.log(this.progressTime(e.offsetX), 'this.progressTime(e.offsetY)')
       utils.changeInnerText('sn-player-roll-time', this.progressTime(e.offsetX))
       utils.showClass('sn-player-roll-time')
       this.rollTime.style.left = e.offsetX - 20 + 'px'
     })
     this.progress.addEventListener('mouseout', (e) => {
+      // this.playVideo.pause()
       utils.hiddenClass('sn-player-roll-time')
     })
+
+    let playDotFun = (event) => {
+      this.playVideo.pause()
+      this.playDot.style.cursor = "pointer";
+      let offsetX = parseInt(this.playDot.style.left); // 获取当前的x轴距离
+      // let offsetY = parseInt(this.playDot.style.top); // 获取当前的y轴距离
+      let innerX = event.clientX - offsetX; // 获取鼠标在方块内的x轴距
+      // let innerY = event.clientY - offsetY; // 获取鼠标在方块内的y轴距
+      // 按住鼠标时为div添加一个border
+      // 鼠标移动的时候不停的修改div的left和top值
+      document.onmousemove =  (event) => {
+        let leftNum = event.clientX - innerX
+        this.playDot.style.left = leftNum + "px";
+        // this.playDot.style.top = event.clientY - innerY + "px";
+        // 边界判断
+        if (parseInt(this.playDot.style.left) <= 0) {
+          leftNum = 0
+          this.playDot.style.left = "0px";
+        }
+        if (parseInt(this.playDot.style.left) >= window.innerWidth - parseInt(this.playDot.style.width)) {
+          leftNum = window.innerWidth - parseInt(this.playDot.style.width)
+          this.playDot.style.left = leftNum + "px";
+        }
+        this.progressFinish.style.width = this.playDot.style.left
+
+        this.playVideo.currentTime = currentTime(leftNum)
+      }
+      document.onmouseup =  () => {
+        document.onmousemove = null;
+        document.onmouseup = null;
+        this.playVideo.play()
+      }
+    }
+
+    let currentTime = (offsetY) => {
+      return (offsetY / this.progressw * this.playVideo.duration).toFixed(2)
+    }
+
+
+
+    this.playDot.addEventListener('mousedown', playDotFun, false)
+    // 滑动
   }
 
+
   // 计算进度条时间
-   progressTime(offsetY) {
-     return utils.formatSeconds((offsetY / this.progressw * this.playVideo.duration).toFixed(2))
-   }
+  progressTime(offsetY) {
+    return utils.formatSeconds((offsetY / this.progressw * this.playVideo.duration).toFixed(2))
+  }
 
 
   // 进度条计算公式
@@ -123,9 +199,9 @@ class snailPlayer {
   }
 
   funcToShow() {
-    this.playVideo.onmouseover =  () => {
+    this.playVideo.onmouseover = () => {
       clearTimeout(this.timer)
-     utils.addClass(this.playFunc, 'func-active')
+      utils.addClass(this.playFunc, 'func-active')
     }
 
     this.playVideo.onmouseout = () => {
@@ -144,44 +220,42 @@ class snailPlayer {
       }, 100)
     }
   }
- // 全屏
+
+  // 全屏
   fullScreenFun() {
     const docElm = document.documentElement
-    this.fullScreen.onclick =  () => {
-      if( !utils.hasClass(this.el, 'fullscreen-active') ) {
-        utils.addClass(this.el, 'fullscreen-active')
-        utils.addClass(this.playVideo, 'fullscreen-active')
-        utils.showClass('snail-player-full-screen-icon')
-        utils.hiddenClass('snail-player-fullscreen-btn')
-        utils.changeInnerText('fullscreen-icon', '退出全屏')
-        utils.addClass(this.playBottom, 'sn-player-fullscreen-bottom-active')
-        setTimeout(() => {
-          if (docElm.requestFullscreen) {
-            docElm.requestFullscreen();
-          } else if (docElm.mozRequestFullScreen) {
-            docElm.mozRequestFullScreen();
-          } else if (document.webkitRequestFullScreen) {
-            docElm.webkitRequestFullScreen();
-          }
-        }, 100)
-      }else {
-        if(document.exitFullscreen) {
-          document.exitFullscreen();
-        }else if(document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        }else if(document.webkitCancelFullScreen) {
-          document.webkitCancelFullScreen();
+    if (!utils.hasClass(this.el, 'fullscreen-active')) {
+      utils.addClass(this.el, 'fullscreen-active')
+      utils.addClass(this.playVideo, 'fullscreen-active')
+      utils.showClass('snail-player-full-screen-icon')
+      utils.hiddenClass('snail-player-fullscreen-btn')
+      utils.changeInnerText('fullscreen-icon', '退出全屏')
+      utils.addClass(this.playBottom, 'sn-player-fullscreen-bottom-active')
+      setTimeout(() => {
+        if (docElm.requestFullscreen) {
+          docElm.requestFullscreen();
+        } else if (docElm.mozRequestFullScreen) {
+          docElm.mozRequestFullScreen();
+        } else if (document.webkitRequestFullScreen) {
+          docElm.webkitRequestFullScreen();
         }
-        utils.removeClass(this.el, 'fullscreen-active')
-        utils.removeClass(this.playVideo, 'fullscreen-active')
-        utils.hiddenClass('snail-player-full-screen-icon')
-        utils.showClass('snail-player-fullscreen-btn')
-        utils.changeInnerText('fullscreen-icon', '进入全屏')
-        utils.removeClass(this.playBottom, 'sn-player-fullscreen-bottom-active')
+      }, 100)
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
       }
+      utils.removeClass(this.el, 'fullscreen-active')
+      utils.removeClass(this.playVideo, 'fullscreen-active')
+      utils.hiddenClass('snail-player-full-screen-icon')
+      utils.showClass('snail-player-fullscreen-btn')
+      utils.changeInnerText('fullscreen-icon', '进入全屏')
+      utils.removeClass(this.playBottom, 'sn-player-fullscreen-bottom-active')
     }
   }
-
 
 
   // 设置值
@@ -201,7 +275,7 @@ class snailPlayer {
         utils.hiddenClass('sn-player-player-start')
         utils.showClass('sn-player-player-pause')
         this.playing = true
-      }else {
+      } else {
         this.playVideo.pause()
         utils.hiddenClass('sn-player-player-pause')
         utils.showClass('sn-player-player-start')

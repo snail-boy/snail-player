@@ -57,7 +57,6 @@ class Utils {
       }
       time += sec;
     }
-    console.log(time, 'time')
     return time;
   }
 
