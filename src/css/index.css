@@ -1,0 +1,279 @@
+.snail-wrapper {
+    position: relative;
+    user-select: none;
+    max-width: 60vw;
+    min-width: 660px;
+    max-height: 100vh;
+    height: 37.2vw;
+    min-height: 408px;
+    overflow: hidden;
+    background: black;
+}
+.fullscreen-active {
+    width: 100%;
+    height: 100vh !important;
+    overflow: hidden;
+    max-width: 100%;
+    background: black;
+}
+.fullscreen-active .sn-player-video-wrapper {
+    height: 100vh !important;
+}
+#snailPlayVideo {
+    height: calc(37.2vw - 49px);
+    min-height: 100%;
+}
+.sn-player-video-wrapper {
+    width: 100%;
+    height: calc(37.2vw - 49px);
+    min-height: 370px;
+}
+
+
+.sn-player-bottom-wrapper {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to top, black, transparent);
+    transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.sn-player-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, .3);
+    /*transition: height 0s;*/
+}
+
+.sn-player-progress-cache {
+    width: 30%;
+    height: 4px;
+    background: rgba(255, 255, 255, 1);
+}
+.sn-player-progress-player {
+    width: 20%;
+    height: 4px;
+    background: #ff4141;
+}
+
+.sn-player-progress:hover .sn-player-progress-bar {
+    cursor: pointer;
+    transform: scale(1, 1.8);
+}
+.sn-player-progress:hover .sn-player-progress-player-dot {
+    display: block;
+}
+.sn-player-progress-player-dot {
+    position: absolute;
+    top: -6px;
+    left: calc(20% - 8px);
+    display: none;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    background: white;
+}
+
+/*time*/
+.sn-player-time {
+    position: absolute;
+    left: 0;
+    top: -25px;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 6px;
+    color: white;
+    height: 22px;
+    font-size: 12px;
+}
+
+
+/*播放器功能*/
+.sn-player-func {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 46px;
+}
+
+.sn-player-progress-wrapper {
+    height: 50px;
+    background: linear-gradient(to top, rgba(0,0,0,.3), transparent);
+    transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.func-active {
+    transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translate(0, -46px);
+}
+
+.sn-player-info-wrapper {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background: #232324;
+}
+
+.time-scale {
+    line-height: 50px;
+    color: white;
+    margin-left: 16px;
+}
+
+.player-btn-box {
+    margin-left: 12px;
+    fill: #fff;
+}
+
+.sn-player-play-btn-tip {
+    left: 6px;
+}
+.icon-btn-tip {
+    position: absolute;
+    left: 6px;
+    top: -27px;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 6px;
+    color: #d6d6d6;
+    font-size: 12px;
+    display: none;
+}
+
+.player-btn-box:hover .sn-player-play-btn {
+    display: block;
+}
+
+.player-btn-box:hover {
+    fill: #eee;
+}
+
+.sn-player-total-time {
+    color: rgba(255, 255, 255, .5);
+}
+
+
+/*功能函数右边*/
+.sn-player-right-item {
+    position: relative;
+    width: 52px;
+    height: 46px;
+}
+.sn-player-right-item:hover {
+    cursor: pointer;
+}
+
+.sn-player-right-item:hover .sn-player-square-detail {
+    display: block;
+}
+
+.square-box {
+    width: 86px;
+}
+
+.sn-player-square:hover {
+    background-color: #ff4141;
+}
+.sn-player-square-detail .active {
+    color: #ff4141;
+}
+.sn-player-square-detail {
+    position: absolute;
+    top: -117px;
+    left: 8px;
+    width: 30px;
+    height: 118px;
+    background: rgba(0,0,0,.8);
+    border-radius: 6px;
+    color: rgba(165, 165, 165, 0.8);
+    text-align: center;
+    padding: 0 20px;
+    font-size: 12px;
+    transform: translate(0, 0px);
+    margin: 0 auto;
+    z-index: 100;
+}
+.triangle-box {
+    width: 0;
+    height: 0;
+    border: 6px solid;
+    border-color: rgba(0,0,0,.8) transparent transparent;
+    margin-left: 10px;
+}
+.detail-speed-btn:hover + .detail-speed {
+    z-index: 10;
+}
+
+.sn-player-square-detail li {
+    margin: 10px auto;
+    transition: all .3s;
+    transform: scale(1);
+}
+.sn-player-square-detail li:hover {
+    transform: scale(1.2);
+    color: white;
+}
+.sn-player-square {
+    width: 60px;
+    height: 24px;
+    color: rgba(255, 255, 255, .8);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, .8);
+    text-align: center;
+    font-family: PingFangSC-Regular;
+    font-size: 13px;
+    line-height: 24px;
+    margin: 10px auto;
+}
+
+.sn-player-right-item .setting-icon {
+    transform: rotate(0deg);
+    transition: transform .3s;
+    margin: 12px;
+}
+.setting-icon:hover {
+    transform: rotate(90deg);
+}
+.icon-tip {
+    position: absolute;
+    top: -26px;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 6px;
+    color: #d6d6d6;
+    font-size: 12px;
+    word-break: keep-all;
+    display: none;
+}
+.picture-in-picture {
+    left: 0;
+}
+.web-fullscreen-icon {
+    left: -20px;
+}
+.fullscreen-icon {
+    left: -10px;
+}
+.icon:hover + .icon-tip {
+    display: block;
+}
+.snail-player-fullscreen:hover + .fullscreen-icon {
+    display: block;
+}
+.picture-in-picture:hover {
+    display: block;
+}
+
+
+/*icon*/
+
+.sn-player-fullscreen-bottom-active {
+    transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translate(0, 50px);
+}
