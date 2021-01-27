@@ -9,9 +9,8 @@
 }
 
 .svg-box {
-    line-height: 62px;
+    line-height: 12px;
     width: 24px;
-    height: 46px;
     color: white;
 }
 svg {
@@ -44,4 +43,10 @@ svg {
     100% {
         transform: scale(1);
     }
+}
+.dn {
+    display: none;
+}
+.db {
+    display: block;
 }

@@ -32,6 +32,7 @@ class Utils {
     document.getElementsByClassName(cls)[0].innerHTML = text
   }
   formatSeconds(value) {
+    if(!value) return '00:00'
     value = parseInt(value);
     let time;
     if (value > -1) {
@@ -42,7 +43,11 @@ class Utils {
       if (day > 0) {
         hour = hour - 24 * day;
         time = day + "day " + hour + ":";
-      } else time = hour + ":";
+      } else if (hour > 0) {
+        time = hour + ":";
+      }else {
+        time = "";
+      }
       if (min < 10) {
         time += "0";
       }
@@ -55,6 +60,11 @@ class Utils {
     console.log(time, 'time')
     return time;
   }
+
+  classEle(cls) {
+    return  cls && document.getElementsByClassName(cls)[0]
+  }
+
 }
 
 export default Utils
