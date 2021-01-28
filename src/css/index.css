@@ -260,16 +260,18 @@
 .sn-player-square:hover {
     background-color: #ff4141;
 }
-.sn-player-square-detail .active {
-    color: #ff4141;
+
+.sn-player-square-detail .sn-player-speed-active {
+    color: #ff4141 !important;
 }
+
 .sn-player-square-detail {
     position: absolute;
     top: -117px;
     left: 8px;
     width: 30px;
     height: 118px;
-    background: rgba(0,0,0,.8);
+    background: rgba(0,0,0,.4);
     border-radius: 6px;
     color: rgba(165, 165, 165, 0.8);
     text-align: center;
@@ -278,6 +280,7 @@
     transform: translate(0, 0px);
     margin: 0 auto;
     z-index: 100;
+    display: none;
 }
 .triangle-box {
     width: 0;
@@ -286,7 +289,7 @@
     border-color: rgba(0,0,0,.8) transparent transparent;
     margin-left: 10px;
 }
-.detail-speed-btn:hover + .detail-speed {
+.sn-player-detail-speed-btn:hover + .detail-speed {
     z-index: 10;
 }
 

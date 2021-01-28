@@ -35,6 +35,8 @@ class snailPlayer {
     this.isFullScreen = false // 是否全屏
     this.isWebFullScreen = false // 是否网页全屏
     this.progresscache = null // 缓存进度条
+    this.speedWrapper = null // 倍速ul
+    this.speedText = null // 倍速文字
     this.getEle()
   }
 
@@ -73,6 +75,10 @@ class snailPlayer {
     // 缓存进度条
     this.progresscache = utils.classEle('sn-player-progress-cache')
 
+    // 倍速
+    this.speedWrapper = utils.classEle('sn-player-speed-ul')
+    this.speedText = utils.classEle('sn-player-detail-speed-btn')
+
     this.init()
     // this.funcToShow()
     this.setValue()
@@ -100,8 +106,10 @@ class snailPlayer {
       this.playDot.style.left = this.progressCalculate() + 'px'
 
       // 缓存进度条
-      let percentage = +(this.playVideo.buffered.end(this.playVideo.buffered.length - 1)/this.playVideo.duration).toFixed(2)
+      let percentage = +(this.playVideo.buffered.end(this.playVideo.buffered.length - 1) / this.playVideo.duration).toFixed(2)
       this.progresscache.style.width = Math.floor(this.progress.getBoundingClientRect().width * percentage) + 'px'
+
+      // this.playVideo.playbackRate = 1.75
     }
 
     // 播放结束后
@@ -191,7 +199,22 @@ class snailPlayer {
       this.playVideo.volume = topNum / 130
     }
 
+
+    // 倍速
+
+    this.speedWrapper.onclick = (e) => {
+      if(e.target.innerHTML.indexOf('<li') <= -1) {
+        utils.clickfu(e.target, 'sn-player-speed-active')
+        this.playVideo.playbackRate = e.target.innerHTML.replace('x', '')
+        if(e.target.innerHTML !== '1x') {
+          this.speedText.innerHTML = e.target.innerHTML
+        }else {
+          this.speedText.innerHTML = '倍速'
+        }
+      }
+    }
   }
+
 
   // 声音组件
   voiceFunc() {

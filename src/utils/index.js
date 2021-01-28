@@ -31,6 +31,15 @@ class Utils {
   changeInnerText(cls, text) {
     document.getElementsByClassName(cls)[0].innerHTML = text
   }
+
+  clickfu (to, cls) {
+    //回调函数，to为点击对象
+    to.setAttribute("class", cls);
+    const siblings = to.parentNode.childNodes;
+    for (let i = 0; i < siblings.length; i++)
+      if (siblings[i].nodeType == 1 && siblings[i] != to) siblings[i].className = '';
+  }
+
   formatSeconds(value) {
     if(!value) return '00:00'
     value = parseInt(value);
