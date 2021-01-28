@@ -20,7 +20,7 @@ class Utils {
   }
 
   get(key) {
-    localStorage.getItem(key)
+    return  localStorage.getItem(key)
   }
   showClass(cls) {
     cls ? document.getElementsByClassName(cls)[0].style.display = 'block' : new Error('请输入类名')

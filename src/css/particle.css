@@ -29,6 +29,7 @@ svg {
 }
 
 .hover-scale-12:hover {
+    fill: #dcdcdc !important;
     animation: scaleToInit .3s;
     animation-iteration-count: 1;
 }

@@ -26,6 +26,11 @@ class snailPlayer {
     this.playDot = null // 拖拽点
     this.playing = false
     this.dbClickTimer = null // 但双击定时器
+    this.voiceDot = null // 声音按钮
+    this.voiceProgress = null // 声音进度条
+    this.voiceProgressFinish = null // 声音进度条完成
+    this.voiceNum = null // 声音值
+    this.voiceBtn = null // 声音按钮
     this.getEle()
   }
 
@@ -47,17 +52,27 @@ class snailPlayer {
 
     this.rollTime = utils.classEle('sn-player-roll-time')
     this.playDot = utils.classEle('sn-player-progress-player-dot')
+    this.voiceDot = utils.classEle('sn-player-progress-voice-dot')
+
+    this.voiceBtn = utils.classEle('sn-player-voice-controller')
+    this.voiceProgress = utils.classEle('sn-player-voice-progress')
+    this.voiceProgressFinish = utils.classEle('sn-player-voice-progress-finish')
+
+    this.voiceNum = utils.classEle('sn-player-voice-number')
 
 
     this.progressw = this.progress.getBoundingClientRect().width
-
 
     this.init()
     // this.funcToShow()
     this.setValue()
 
     this.videoFunc()
+    // 视频进度条
     this.eventFun()
+
+    // 声音进度条
+    this.voiceProgressFun()
   }
 
   init() {
@@ -127,12 +142,49 @@ class snailPlayer {
       this.progressFinish.style.width = this.playDot.style.left
       this.playVideo.currentTime = currentTime(e.offsetX)
     }
+
+    // 声音按钮
+    this.voiceFunc()
+
+    this.voiceBtn.onclick = () =>  {
+      this.voiceFunc()
+    }
+
+  }
+
+  // 声音组件
+  voiceFunc() {
+    let snPlayerVolume = utils.get('snPlayerVolume')
+    console.log(snPlayerVolume, '11')
+    this.voiceDot.style.bottom = snPlayerVolume + 'px'
+    this.voiceProgressFinish.style.height = snPlayerVolume + 'px'
+
+    if(this.voiceNum.innerHTML <= 0) {
+      this.playVideo.volume = snPlayerVolume / 130
+      utils.showClass('sn-player-voice-open')
+      utils.hiddenClass('sn-player-voice-close')
+      utils.changeInnerText('sn-player-voice-number', snPlayerVolume)
+    }else {
+      utils.hiddenClass('sn-player-voice-open')
+      utils.showClass('sn-player-voice-close')
+      utils.changeInnerText('sn-player-voice-number', 0)
+      this.playVideo.volume = 0 / 130
+      this.voiceDot.style.bottom = 0 + 'px'
+      this.voiceProgressFinish.style.height = 0 + 'px'
+    }
   }
 
 
   // 监听事件
   eventFun() {
     // 鼠标移动时，时间随着移动
+    this.progress.addEventListener('mouseover', (e) => {
+      this.progress.onclick = (e) => {
+        this.playDot.style.left = e.offsetX + 'px'
+        this.progressFinish.style.width = this.playDot.style.left
+        this.playVideo.currentTime = currentTime(e.offsetX)
+      }
+    })
     this.progress.addEventListener('mousemove', (e) => {
       utils.changeInnerText('sn-player-roll-time', this.progressTime(e.offsetX))
       utils.showClass('sn-player-roll-time')
@@ -145,17 +197,14 @@ class snailPlayer {
 
     let playDotFun = (event) => {
       this.playVideo.pause()
+      let leftNum = ''
       this.playDot.style.cursor = "pointer";
       let offsetX = parseInt(this.playDot.style.left); // 获取当前的x轴距离
-      // let offsetY = parseInt(this.playDot.style.top); // 获取当前的y轴距离
       let innerX = event.clientX - offsetX; // 获取鼠标在方块内的x轴距
-      // let innerY = event.clientY - offsetY; // 获取鼠标在方块内的y轴距
-      // 按住鼠标时为div添加一个border
       // 鼠标移动的时候不停的修改div的left和top值
       document.onmousemove =  (event) => {
-        let leftNum = event.clientX - innerX
+        leftNum = event.clientX - innerX
         this.playDot.style.left = leftNum + "px";
-        // this.playDot.style.top = event.clientY - innerY + "px";
         // 边界判断
         if (parseInt(this.playDot.style.left) <= 0) {
           leftNum = 0
@@ -166,13 +215,16 @@ class snailPlayer {
           this.playDot.style.left = leftNum + "px";
         }
         this.progressFinish.style.width = this.playDot.style.left
-
         this.playVideo.currentTime = currentTime(leftNum)
+
+
       }
       document.onmouseup =  () => {
         document.onmousemove = null;
         document.onmouseup = null;
+        this.progress.onclick = null
         this.playVideo.play()
+        // cancel()
       }
     }
 
@@ -180,10 +232,91 @@ class snailPlayer {
       return (offsetY / this.progressw * this.playVideo.duration).toFixed(2)
     }
 
-
-
     this.playDot.addEventListener('mousedown', playDotFun, false)
     // 滑动
+
+
+    // // cancel()
+    // let cancel = () => {
+    //   this.progress.removeEventListener('mousemove')
+    //   this.progress.removeEventListener('mouseout')
+    // }
+  }
+
+
+  // 声音进度条
+  voiceProgressFun() {
+
+    // this.voiceProgress.addEventListener('mousemove', (e) => {
+    //   console.log(e.offsetY, 'offsetY')
+    //   this.voiceDot.style.top =  e.offsetY + 'px'
+    //   // this.voiceProgress.style.height = e.offsetY - 20 + 'px'
+    // })
+    // this.voiceProgress.addEventListener('mouseout', (e) => {
+    //   // this.playVideo.pause()
+    //   // utils.hiddenClass('sn-player-roll-time')
+    // })
+
+
+
+    let voiceDotFun = (event) => {
+      let offsetY = parseInt(this.voiceProgress.getBoundingClientRect().top); // 获取当前的y轴距离
+
+      let topNum = ''
+
+      // 鼠标移动的时候不停的修改div的left和top值
+      document.onmousemove =  (event) => {
+        topNum = 100 - (event.clientY - offsetY)
+        this.voiceDot.style.bottom = 100 - (event.clientY - offsetY) + "px";
+        // 边界判断
+        if (parseInt(this.voiceDot.style.bottom) <= 0) {
+          topNum = 0
+          this.voiceDot.style.bottom = "0px";
+          // 控制按钮
+          utils.hiddenClass('sn-player-voice-open')
+          utils.showClass('sn-player-voice-close')
+        }else {
+          utils.showClass('sn-player-voice-open')
+          utils.hiddenClass('sn-player-voice-close')
+        }
+
+        if (parseInt(this.voiceDot.style.bottom) >= 100) {
+          topNum = 100
+          this.voiceDot.style.bottom = "100px";
+        }
+
+        this.voiceProgressFinish.style.height = topNum + 'px'
+
+        // 赋值
+        utils.changeInnerText('sn-player-voice-number', topNum)
+
+        utils.set('snPlayerVolume', topNum)
+        // 控制声音
+        this.playVideo.volume = topNum / 130
+
+
+      }
+      document.onmouseup =  () => {
+        document.onmousemove = null;
+        document.onmouseup = null;
+        // this.voiceDot.play()
+        // cancel()
+      }
+    }
+
+
+    this.voiceDot.addEventListener('mousedown', voiceDotFun, false)
+
+
+
+    // cancel()
+    let cancel = () => {
+      this.voiceProgress.removeEventListener('mousemove')
+      this.voiceProgress.removeEventListener('mouseout')
+    }
+
+
+
   }
 
 
@@ -196,6 +329,12 @@ class snailPlayer {
   // 进度条计算公式
   progressCalculate() {
     return (this.progressw / this.playVideo.duration * this.playVideo.currentTime).toFixed(2)
+  }
+
+  // 声音计算公式
+  voiceCalculate(Y, y, X) {
+    let x =  y / Y * X
+     return x
   }
 
   funcToShow() {
