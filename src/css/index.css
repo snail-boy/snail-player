@@ -20,6 +20,21 @@
 .fullscreen-active .sn-player-video-wrapper {
     height: 100vh !important;
 }
+
+
+.web-fullscreen-active {
+    width: 100%;
+    height: 100vh !important;
+    overflow: hidden;
+    max-width: 100%;
+    background: black;
+}
+
+.web-fullscreen-active .sn-player-video-wrapper {
+    height: 100vh !important;
+}
+
+
 #snailPlayVideo {
     height: calc(37.2vw - 49px);
     min-height: 100%;
@@ -103,7 +118,7 @@
 }
 
 .sn-player-progress-cache {
-    width: 30%;
+    width: 0;
     height: 4px;
     background: rgba(255, 255, 255, 1);
 }
@@ -385,6 +400,10 @@
 .icon:hover + .icon-tip {
     display: block;
 }
+
+.snail-player-web-fullscreen:hover + .web-fullscreen-icon {
+    display: block;
+}
 .snail-player-fullscreen:hover + .fullscreen-icon {
     display: block;
 }
@@ -396,6 +415,11 @@
 /*icon*/
 
 .sn-player-fullscreen-bottom-active {
+    transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translate(0, 50px);
+}
+
+.sn-player-web-fullscreen-bottom-active {
     transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform: translate(0, 50px);
 }

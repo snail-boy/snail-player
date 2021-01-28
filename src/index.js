@@ -31,6 +31,10 @@ class snailPlayer {
     this.voiceProgressFinish = null // 声音进度条完成
     this.voiceNum = null // 声音值
     this.voiceBtn = null // 声音按钮
+    this.webFullScreen = null // 网页全屏
+    this.isFullScreen = false // 是否全屏
+    this.isWebFullScreen = false // 是否网页全屏
+    this.progresscache = null // 缓存进度条
     this.getEle()
   }
 
@@ -60,8 +64,14 @@ class snailPlayer {
 
     this.voiceNum = utils.classEle('sn-player-voice-number')
 
-
     this.progressw = this.progress.getBoundingClientRect().width
+
+
+    // 网页全屏
+    this.webFullScreen = utils.classEle('snail-player-web-fullscreen')
+
+    // 缓存进度条
+    this.progresscache = utils.classEle('sn-player-progress-cache')
 
     this.init()
     // this.funcToShow()
@@ -88,6 +98,10 @@ class snailPlayer {
       // 进度条滚动
       this.progressFinish.style.width = this.progressCalculate() + 'px'
       this.playDot.style.left = this.progressCalculate() + 'px'
+
+      // 缓存进度条
+      let percentage = +(this.playVideo.buffered.end(this.playVideo.buffered.length - 1)/this.playVideo.duration).toFixed(2)
+      this.progresscache.style.width = Math.floor(this.progress.getBoundingClientRect().width * percentage) + 'px'
     }
 
     // 播放结束后
@@ -122,9 +136,13 @@ class snailPlayer {
     }
 
     // 全屏
-
     this.fullScreen.onclick = () => {
       this.fullScreenFun()
+    }
+
+    // 网页全屏
+    this.webFullScreen.onclick = () => {
+      this.webFullScreenFun()
     }
 
     // 双击全屏或退出全屏
@@ -145,9 +163,32 @@ class snailPlayer {
 
     // 声音按钮
     this.voiceFunc()
-
     this.voiceBtn.onclick = () =>  {
       this.voiceFunc()
+    }
+
+    this.voiceProgress.onclick = (event) => {
+      let offsetY = parseInt(this.voiceProgress.getBoundingClientRect().top); // 获取当前的y轴距离
+      let topNum = 100 - (event.clientY - offsetY)
+      utils.showClass('sn-player-voice-open')
+      utils.hiddenClass('sn-player-voice-close')
+      if (topNum <= 0) {
+        topNum = 0
+        utils.hiddenClass('sn-player-voice-open')
+        utils.showClass('sn-player-voice-close')
+      }else if (topNum >= 100) {
+        topNum = 100
+        utils.showClass('sn-player-voice-open')
+        utils.hiddenClass('sn-player-voice-close')
+      }
+      this.voiceDot.style.bottom =  topNum + 'px'
+      this.voiceProgressFinish.style.height = this.voiceDot.style.bottom
+
+      // 赋值
+      utils.changeInnerText('sn-player-voice-number', topNum)
+      utils.set('snPlayerVolume', topNum)
+      // 控制声音
+      this.playVideo.volume = topNum / 130
     }
 
   }
@@ -155,7 +196,6 @@ class snailPlayer {
   // 声音组件
   voiceFunc() {
     let snPlayerVolume = utils.get('snPlayerVolume')
-    console.log(snPlayerVolume, '11')
     this.voiceDot.style.bottom = snPlayerVolume + 'px'
     this.voiceProgressFinish.style.height = snPlayerVolume + 'px'
 
@@ -173,6 +213,8 @@ class snailPlayer {
       this.voiceProgressFinish.style.height = 0 + 'px'
     }
   }
+
+
 
 
   // 监听事件
@@ -235,29 +277,18 @@ class snailPlayer {
     this.playDot.addEventListener('mousedown', playDotFun, false)
     // 滑动
 
-
-    // // cancel()
-    // let cancel = () => {
-    //   this.progress.removeEventListener('mousemove')
-    //   this.progress.removeEventListener('mouseout')
-    // }
   }
 
 
   // 声音进度条
   voiceProgressFun() {
-
-    // this.voiceProgress.addEventListener('mousemove', (e) => {
-    //   console.log(e.offsetY, 'offsetY')
-    //   this.voiceDot.style.top =  e.offsetY + 'px'
-    //   // this.voiceProgress.style.height = e.offsetY - 20 + 'px'
+    // this.voiceProgress.addEventListener('mouseover', (e) => {
+    //   let offsetY = parseInt(this.voiceProgress.getBoundingClientRect().top); // 获取当前的y轴距离
+    //   this.voiceDot.onclick = (event) => {
+    //     this.voiceDot.style.bottom =  100 - (event.clientY - offsetY) + 'px'
+    //     this.voiceProgressFinish.style.height = this.voiceDot.style.bottom
+    //   }
     // })
-    // this.voiceProgress.addEventListener('mouseout', (e) => {
-    //   // this.playVideo.pause()
-    //   // utils.hiddenClass('sn-player-roll-time')
-    // })
-
-
 
     let voiceDotFun = (event) => {
       let offsetY = parseInt(this.voiceProgress.getBoundingClientRect().top); // 获取当前的y轴距离
@@ -308,15 +339,6 @@ class snailPlayer {
     this.voiceDot.addEventListener('mousedown', voiceDotFun, false)
 
 
-
-    // cancel()
-    let cancel = () => {
-      this.voiceProgress.removeEventListener('mousemove')
-      this.voiceProgress.removeEventListener('mouseout')
-    }
-
-
-
   }
 
 
@@ -363,7 +385,7 @@ class snailPlayer {
   // 全屏
   fullScreenFun() {
     const docElm = document.documentElement
-    if (!utils.hasClass(this.el, 'fullscreen-active')) {
+    if (!this.isFullScreen) {
       utils.addClass(this.el, 'fullscreen-active')
       utils.addClass(this.playVideo, 'fullscreen-active')
       utils.showClass('snail-player-full-screen-icon')
@@ -379,6 +401,8 @@ class snailPlayer {
           docElm.webkitRequestFullScreen();
         }
       }, 100)
+      this.isFullScreen = true
+      utils.hiddenClass('snail-player-web-fullscreen-box')
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
@@ -387,12 +411,35 @@ class snailPlayer {
       } else if (document.webkitCancelFullScreen) {
         document.webkitCancelFullScreen();
       }
+      utils.showClass('snail-player-web-fullscreen-box')
       utils.removeClass(this.el, 'fullscreen-active')
       utils.removeClass(this.playVideo, 'fullscreen-active')
       utils.hiddenClass('snail-player-full-screen-icon')
       utils.showClass('snail-player-fullscreen-btn')
       utils.changeInnerText('fullscreen-icon', '进入全屏')
       utils.removeClass(this.playBottom, 'sn-player-fullscreen-bottom-active')
+      this.isFullScreen = false
+    }
+  }
+
+  // 网页全屏
+  webFullScreenFun() {
+    if (!this.isWebFullScreen) {
+      utils.addClass(this.el, 'fullscreen-active')
+      utils.addClass(this.playVideo, 'fullscreen-active')
+      utils.showClass('snail-player-web-close-fullscreen-btn')
+      utils.hiddenClass('snail-player-web-fullscreen-btn')
+      utils.changeInnerText('web-fullscreen-icon', '退出网页全屏')
+      utils.addClass(this.playBottom, 'sn-player-web-fullscreen-bottom-active')
+      this.isWebFullScreen = true
+    } else {
+      utils.removeClass(this.el, 'fullscreen-active')
+      utils.removeClass(this.playVideo, 'fullscreen-active')
+      utils.hiddenClass('snail-player-web-close-fullscreen-btn')
+      utils.showClass('snail-player-web-fullscreen-btn')
+      utils.changeInnerText('web-fullscreen-icon', '进入网页全屏')
+      utils.removeClass(this.playBottom, 'sn-player-web-fullscreen-bottom-active')
+      this.isWebFullScreen = false
     }
   }
 
