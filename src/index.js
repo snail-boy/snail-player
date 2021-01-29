@@ -80,7 +80,9 @@ class snailPlayer {
     this.speedText = utils.classEle('sn-player-detail-speed-btn')
 
     this.init()
-    // this.funcToShow()
+
+    this.funcToShow()
+
     this.setValue()
 
     this.videoFunc()
