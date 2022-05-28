@@ -8,13 +8,13 @@ const TerserWebpackPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   // 指定文件的入口
-  entry: "./src/index.js",
+  entry: "./lib/index.js",
   //出口
   output: {
     // 定义文件名
-    filename: "main.js",
+    filename: "./main.js",
     // 定义文件夹  // __dirname获取当前目录
-    path: __dirname + "dist",
+    path: __dirname + "/dist",
   },
   plugins: [
     // 实例化vue插件
@@ -30,7 +30,7 @@ module.exports = {
     open: true, //打开浏览器
     host: "localhost", //本地域名
     port: 8080, //端口号
-    hot: false, //热加载
+    hot: true, //热加载
   },
   // 模块
   module:{

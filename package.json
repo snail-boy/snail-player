@@ -1,8 +1,8 @@
 {
   "name": "snail-player",
-  "version": "1.0.0",
-  "description": "一个h5视频播放器",
-  "main": "src/index.js",
+  "version": "0.0.1",
+  "description": "一个h5视频播放器, 功能高度完善，基本满足使用。及原生插件，vue插件，npm插件于一身。仅供学习，禁止商用",
+  "main": "lib/SnailPlayer.js",
   "scripts": {
     "serve": "webpack --watch",
     "build": "webpack",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/websmallrabbit/snail-player.git"
+    "url": "git+https://github.com/snail-boy/snail-player.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/websmallrabbit/snail-player/issues"
+    "url": "https://github.com/snail-boy/snail-player/issues"
   },
-  "homepage": "https://github.com/websmallrabbit/snail-player#readme",
+  "homepage": "https://github.com/snail-boy/snail-player#readme",
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
