@@ -2,19 +2,21 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const optimizeCss = require('optimize-css-assets-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-//导入css压缩插件
-//导入js压缩插件
+const { resolve } = require('path')
+
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 
 module.exports = {
+  mode: 'development',
+  watch:false,
   // 指定文件的入口
   entry: "./lib/index.js",
   //出口
   output: {
     // 定义文件名
-    filename: "./main.js",
+    filename: 'main.js',
     // 定义文件夹  // __dirname获取当前目录
-    path: __dirname + "/dist",
+    path: resolve(__dirname, 'dist'),
   },
   plugins: [
     // 实例化vue插件
@@ -23,7 +25,7 @@ module.exports = {
       template: "./public/index.html"
     }),
     new MiniCssExtractPlugin({
-      filename: "style-[hash:7].css",
+      filename: './css/[name].css'
     })
   ],
   devServer: {
@@ -38,10 +40,14 @@ module.exports = {
     rules:[
       {
         //测试.css文件结尾
-        test:/\.css$/,
+        test: /\.css$/i,
         // 使用两个loader加载器
-        use:["style-loader","css-loader"],
-
+        use:[
+          // "style-loader", // 将css打包到js中
+          // 2. 将css打包到独立文件中
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ],
       }
     ]
   },
@@ -52,8 +58,6 @@ module.exports = {
     splitChunks: {
       chunks: "all",
     }
-  },
-  mode: 'development',
-  watch:true
+  }
 };
 // module.export node中导出模块的意思

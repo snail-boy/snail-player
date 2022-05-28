@@ -1,11 +1,16 @@
 {
   "name": "snail-player",
+  "description": "一个纯原生js,html h5播放器。功能完善，仅用于学习，禁止商用",
+  "keywords": [
+    "h5播放器",
+    "原生h5播放器"
+  ],
   "version": "0.0.1",
-  "description": "一个h5视频播放器, 功能高度完善，基本满足使用。及原生插件，vue插件，npm插件于一身。仅供学习，禁止商用",
-  "main": "lib/SnailPlayer.js",
+  "main": "lib/index.js",
   "scripts": {
-    "serve": "webpack --watch",
-    "build": "webpack",
+    "serve": "webpack --mode development --watch",
+    "dev": "webpack-dev-server --port=8000",
+    "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
