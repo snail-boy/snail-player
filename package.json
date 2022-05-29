@@ -5,7 +5,7 @@
     "h5播放器",
     "原生h5播放器"
   ],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "scripts": {
     "serve": "webpack --mode development --watch",
